@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'rake'
 require 'rake/testtask'
-require 'rake/rdoctask'
+require 'rdoc/task'
 
 begin
   require 'jeweler'
@@ -35,9 +35,9 @@ Happy juicing!
   end
 
   Jeweler::GemcutterTasks.new
-  Jeweler::RubyforgeTasks.new do |rubyforge|
-    rubyforge.doc_task = "rdoc"
-  end
+  #Jeweler::RubyforgeTasks.new do |rubyforge|
+  #  rubyforge.doc_task = "rdoc"
+  #end
 rescue LoadError => err
   puts "Jeweler (or a dependency) not available. Install it with: sudo gem install jeweler"
   puts err.message

@@ -8,8 +8,8 @@ class TestImageEmbed < Test::Unit::TestCase
     setup do
       FakeFS.activate!
       FileSystem.clear
-      FileUtils.mkdir_p("/stylesheets")
       FileUtils.mkdir_p("/images")
+      FileUtils.mkdir_p("/stylesheets")
 
       @supported_assets = [
                            { :path => '/images/test.png', :content => 'hello png!' },
@@ -77,10 +77,12 @@ class TestImageEmbed < Test::Unit::TestCase
         setup do
           @document_root = '/path/to/public/dir'
           @another_embedder = Juicer::ImageEmbed.new(:type => :data_uri, :document_root => @document_root)
+          FileUtils.mkdir_p (@document_root+'/images')
+          FileUtils.mkdir_p (@document_root+'/stylesheets') 
           @files = [{ :path => "#{@document_root}/images/custom-file.png", :filename => '/images/custom-file.png', :content => "hello png!" }]
           create_files(@files)
         end
-
+        
         should "embed urls with embedder" do
           stylesheets = [{ :path => "#{@document_root}/stylesheets/test_absolute_path.css", :content => "body: { background: url(#{@files.first[:filename]}?embed=true); }" }]
           create_files(stylesheets)

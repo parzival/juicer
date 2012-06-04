@@ -20,6 +20,11 @@ if RUBY_VERSION < "1.9"
   require 'redgreen' if ENV['TM_DIRECTORY'].nil?
 end
 
+unless defined?(Test::Unit::AssertionFailedError)
+  Test::Unit::AssertionFailedError = MiniTest::Assertion
+end
+ 
+
 $data_dir = File.join(File.expand_path(File.dirname(__FILE__)), "data")
 Juicer.send(:remove_const, :LOGGER)
 Juicer::LOGGER = Logger.new(StringIO.new)
