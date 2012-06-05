@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 require 'tempfile'
 require 'juicer/binary'
+require 'juicer/minifyer/compressor_base'
 
 module Juicer
   module Minifyer
@@ -29,6 +30,7 @@ module Juicer
     # License::   MIT
     #
     module JavaBase
+      include Juicer::Minifyer::CompressorBase
       include Juicer::Binary
 
       def initialize(options = {})

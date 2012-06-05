@@ -1,4 +1,21 @@
-require "test_helper"
+require "test_helper"            
+            
+
+module Juicer
+  module Minifyer
+    class TestCompressor
+        include Juicer::Minifyer::CompressorBase
+        # Compressor strips line endings, spaces, and semicolons in the sample
+        def compress(file,output)
+            File.open(output, "w") do |output_file|
+                output_file.puts File.read(file).gsub(/[\n\r\s;]/,"")
+            end
+        end
+    end
+  end
+end
+        
+             
 
 class TestMergeCommand < Test::Unit::TestCase
   def setup
@@ -129,9 +146,15 @@ class TestMergeCommand < Test::Unit::TestCase
 
     should "merge files" do
       begin
+        Juicer::Command::Merge.publicize_methods do
+            @merge.instance_eval { @minifyer = "test_compressor" }
+        end
+
         @merge.instance_eval { @output = path("a.min.css") }
         assert @merge.execute(path("a1.css"))
+        # see TestCompressor above for desired compression of css
         assert_match "h2{font-size:10px}html{background:red}h1{font-size:12px}body{width:800px}", IO.read(path("a.min.css"))
+        
       rescue Test::Unit::AssertionFailedError => err
         raise err
       rescue Exception => err

@@ -36,7 +36,7 @@ module Juicer
     #
     class ClosureCompiler
       include Juicer::Minifyer::JavaBase
-      include Juicer::Chainable
+      #include Juicer::Chainable
 
       # Compresses a file using the YUI Compressor. Note that the :bin_path
       # option needs to be set in order for YuiCompressor to find and use the
@@ -48,27 +48,7 @@ module Juicer
       #          original file will be overwritten
       # type = Either :js or :css. If this parameter is not provided, the type
       #        is guessed from the suffix on the input file name
-      def save(file, output = nil, type = nil)
-        type = type.nil? ? file.split('.')[-1].to_sym : type
-
-        use_tmp = unless output
-                    output = file
-                    file = File.join(Dir::tmpdir, File.basename(file) + '.min.tmp.' + type.to_s)
-                    FileUtils.mkdir_p(File.dirname(file))
-                    FileUtils.move(output, file)
-
-                    true
-                  end
-
-        out_dir = File.dirname(output)
-        FileUtils.mkdir_p(out_dir) unless File.exists?(out_dir)
-        execute(%Q{-jar "#{locate_jar}"#{jar_args} --js_output_file "#{output}" --js "#{file}"})
-
-        File.delete(file) if use_tmp
-      end
-
-      chain_method :save
-
+             
       def self.bin_base_name
         "*compiler"
       end
@@ -78,6 +58,11 @@ module Juicer
       end
 
      private
+
+        # Executes the required compression on the input and output files
+        def compress(file, output)
+          execute(%Q{-jar "#{locate_jar}"#{jar_args} --js_output_file "#{output}" --js "#{file}"})
+        end
 
       # Some class level options may be set:
       # :bin_path (defaults to Dir.cwd)

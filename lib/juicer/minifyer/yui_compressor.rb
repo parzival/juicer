@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
-require 'tempfile'
 require 'juicer/minifyer/java_base'
-require 'juicer/chainable'
 
 module Juicer
   module Minifyer
@@ -37,7 +35,7 @@ module Juicer
     #
     class YuiCompressor
       include Juicer::Minifyer::JavaBase
-      include Juicer::Chainable
+      #include Juicer::Chainable
 
       # Compresses a file using the YUI Compressor. Note that the :bin_path
       # option needs to be set in order for YuiCompressor to find and use the
@@ -49,23 +47,7 @@ module Juicer
       #          original file will be overwritten
       # type = Either :js or :css. If this parameter is not provided, the type
       #        is guessed from the suffix on the input file name
-      def save(file, output = nil, type = nil)
-        type = type.nil? ? file.split('.')[-1].to_sym : type
-
-        output ||= file
-        use_tmp = !output.is_a?(String)
-        output = File.join(Dir::tmpdir, File.basename(file) + '.min.tmp.' + type.to_s) if use_tmp
-        FileUtils.mkdir_p(File.dirname(output))
-
-        result = execute(%Q{-jar "#{locate_jar}"#{jar_args} -o "#{output}" "#{file}"})
-
-        if use_tmp                            # If no output file is provided, YUI compressor will
-          output.puts IO.read(output)         # compress to a temp file. This file should be cleared
-          File.delete(output)                 # out after we fetch its contents.
-        end
-      end
-
-      chain_method :save
+      
 
       def self.bin_base_name
         "yuicompressor"
@@ -74,6 +56,7 @@ module Juicer
       def self.env_name
         "YUIC_HOME"
       end
+      
 
      private
       # Returns a map of options accepted by YUI Compressor, currently:
@@ -91,6 +74,17 @@ module Juicer
         { :charset => nil, :line_break => nil, :nomunge => nil,
           :preserve_semi => nil, :disable_optimizations => nil }
       end
+      
+      
+      def create_temp_output(file)
+         file
+      end
+      
+      # Executes the required compression on the input and output files
+      def compress(file,output)
+        execute(%Q{-jar "#{locate_jar}"#{jar_args} -o "#{output}" "#{file}"})
+      end
+      
     end
   end
 end
