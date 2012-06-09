@@ -4,21 +4,16 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{juicer}
+  s.name = "juicer"
   s.version = "1.0.16"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Christian Johansen"]
-  s.date = %q{2012-05-03}
-  s.default_executable = %q{juicer}
-  s.description = %q{Resolve dependencies, merge and minify CSS and JavaScript files with Juicer - the command line tool for frontend engineers}
-  s.email = %q{christian@cjohansen.no}
+  s.date = "2012-06-07"
+  s.description = "Resolve dependencies, merge and minify CSS and JavaScript files with Juicer - the command line tool for frontend engineers"
+  s.email = "christian@cjohansen.no"
   s.executables = ["juicer"]
   s.files = [
-    "GPATH",
-    "GRTAGS",
-    "GSYMS",
-    "GTAGS",
     "Gemfile",
     "Gemfile.lock",
     "History.txt",
@@ -60,10 +55,13 @@ Gem::Specification.new do |s|
     "lib/juicer/merger/javascript_merger.rb",
     "lib/juicer/merger/stylesheet_merger.rb",
     "lib/juicer/minifyer/closure_compiler.rb",
+    "lib/juicer/minifyer/compressor_base.rb",
     "lib/juicer/minifyer/java_base.rb",
+    "lib/juicer/minifyer/rainpress_compressor.rb",
     "lib/juicer/minifyer/yui_compressor.rb",
     "test/bin/jslint-1.0.js",
     "test/bin/jslint.js",
+    "test/bin/rainpress-1.0.gem",
     "test/bin/rhino1_7R1.zip",
     "test/bin/rhino1_7R2-RC1.jar",
     "test/bin/rhino1_7R2-RC1.zip",
@@ -124,27 +122,22 @@ Gem::Specification.new do |s|
     "test/unit/juicer/merger/javascript_merger_test.rb",
     "test/unit/juicer/merger/stylesheet_merger_test.rb",
     "test/unit/juicer/minifyer/closure_compressor_test.rb",
+    "test/unit/juicer/minifyer/rainpress_test.rb",
     "test/unit/juicer/minifyer/yui_compressor_test.rb",
     "test/unit/juicer_test.rb"
   ]
-  s.homepage = %q{http://github.com/cjohansen/juicer}
-  s.post_install_message = %q{Juicer does not ship with third party libraries. You probably want to install
-Yui Compressor and JsLint now:
-
-juicer install yui_compressor
-juicer install jslint
-
-Happy juicing!
-}
+  s.homepage = "http://github.com/cjohansen/juicer"
+  s.post_install_message = "Juicer does not ship with third party libraries. You probably want to install\nYui Compressor and JsLint now:\n\njuicer install yui_compressor\njuicer install jslint\n\nHappy juicing!\n"
   s.require_paths = ["lib"]
-  s.rubyforge_project = %q{juicer}
-  s.rubygems_version = %q{1.4.2}
-  s.summary = %q{Command line tool for CSS and JavaScript developers}
+  s.rubyforge_project = "juicer"
+  s.rubygems_version = "1.8.24"
+  s.summary = "Command line tool for CSS and JavaScript developers"
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<juicer>, [">= 0"])
       s.add_development_dependency(%q<shoulda>, [">= 2.10.2"])
       s.add_development_dependency(%q<mocha>, [">= 0.9.8"])
       s.add_development_dependency(%q<fakefs>, [">= 0.2.1"])
@@ -159,10 +152,16 @@ Happy juicing!
       s.add_development_dependency(%q<fakefs>, [">= 0.2.1"])
       s.add_development_dependency(%q<jeweler>, [">= 0.2.1"])
       s.add_development_dependency(%q<redgreen>, [">= 1.2.2"])
+      s.add_development_dependency(%q<shoulda>, [">= 2.10.2"])
+      s.add_development_dependency(%q<mocha>, [">= 0.9.8"])
+      s.add_development_dependency(%q<fakefs>, [">= 0.2.1"])
+      s.add_development_dependency(%q<jeweler>, [">= 0.2.1"])
+      s.add_development_dependency(%q<rainpress>, [">= 1.0"])
       s.add_runtime_dependency(%q<cmdparse>, [">= 0"])
       s.add_runtime_dependency(%q<nokogiri>, [">= 1.5.0"])
       s.add_runtime_dependency(%q<rubyzip>, [">= 0"])
     else
+      s.add_dependency(%q<juicer>, [">= 0"])
       s.add_dependency(%q<shoulda>, [">= 2.10.2"])
       s.add_dependency(%q<mocha>, [">= 0.9.8"])
       s.add_dependency(%q<fakefs>, [">= 0.2.1"])
@@ -177,11 +176,17 @@ Happy juicing!
       s.add_dependency(%q<fakefs>, [">= 0.2.1"])
       s.add_dependency(%q<jeweler>, [">= 0.2.1"])
       s.add_dependency(%q<redgreen>, [">= 1.2.2"])
+      s.add_dependency(%q<shoulda>, [">= 2.10.2"])
+      s.add_dependency(%q<mocha>, [">= 0.9.8"])
+      s.add_dependency(%q<fakefs>, [">= 0.2.1"])
+      s.add_dependency(%q<jeweler>, [">= 0.2.1"])
+      s.add_dependency(%q<rainpress>, [">= 1.0"])
       s.add_dependency(%q<cmdparse>, [">= 0"])
       s.add_dependency(%q<nokogiri>, [">= 1.5.0"])
       s.add_dependency(%q<rubyzip>, [">= 0"])
     end
   else
+    s.add_dependency(%q<juicer>, [">= 0"])
     s.add_dependency(%q<shoulda>, [">= 2.10.2"])
     s.add_dependency(%q<mocha>, [">= 0.9.8"])
     s.add_dependency(%q<fakefs>, [">= 0.2.1"])
@@ -196,8 +201,14 @@ Happy juicing!
     s.add_dependency(%q<fakefs>, [">= 0.2.1"])
     s.add_dependency(%q<jeweler>, [">= 0.2.1"])
     s.add_dependency(%q<redgreen>, [">= 1.2.2"])
+    s.add_dependency(%q<shoulda>, [">= 2.10.2"])
+    s.add_dependency(%q<mocha>, [">= 0.9.8"])
+    s.add_dependency(%q<fakefs>, [">= 0.2.1"])
+    s.add_dependency(%q<jeweler>, [">= 0.2.1"])
+    s.add_dependency(%q<rainpress>, [">= 1.0"])
     s.add_dependency(%q<cmdparse>, [">= 0"])
     s.add_dependency(%q<nokogiri>, [">= 1.5.0"])
     s.add_dependency(%q<rubyzip>, [">= 0"])
   end
 end
+

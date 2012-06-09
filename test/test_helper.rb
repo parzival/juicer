@@ -48,6 +48,47 @@ class Class
   end
 end
 
+# Allow disabling of constants to test for absence of gems or other files.
+# Provide the name of a constant to temporarily undefine it:
+#   with_constant_unavailable('OptionalClass') do
+#        assert [complain about missing Class]
+#   end 
+module Kernel
+  # Based on answer to http://stackoverflow.com/questions/2697121/simulating-a-missing-gem-in-ruby-unit-tests
+    def with_constant_unavailable(constant_name, &block)
+      owning_module = nil
+      original_constant = nil
+      begin
+        match_data = constant_name.to_s.match(/(?:(.+)::)?(.+)/)
+        if match_data[1]
+          owning_module = match_data[1].split("::").inject(Object) {|mod, name| mod.const_get(name)}
+
+          constant_name = match_data[2].to_sym
+        else
+          owning_module = Object
+          constant_name = constant_name.to_sym
+        end
+      
+        original_constant = owning_module.send :remove_const, constant_name
+      
+      rescue NameError
+        # Constant was probably unavailable to begin with
+        puts "Warning: Constant already undefined: #{constant_name}"
+        yield
+        return
+      end
+      
+      begin
+        yield
+      ensure
+        owning_module.const_set constant_name, original_constant
+      end
+      
+    end
+end
+
+
+
 #
 # Intercept calls to open, and return local files
 #
@@ -75,6 +116,11 @@ module Kernel
 
   module_function :open
 end
+
+# 
+# Use local version of rainpress for testing 
+# 
+gem "rainpress", :path=> File.join($data_dir,"..","bin"), :group=>:test
 
 module Juicer
   module Test
