@@ -7,24 +7,21 @@ class RainpressCompressorTest < Test::Unit::TestCase
     def setup
         @input = "in-file.css"
         @output = "out-file.css"
-        
-        [@input,@output].each do |filename| 
-            File.open(filename, "w") { |f| f.puts "Testing" }
-        end
-
+        File.open( @input, "w") { |f| f.puts "Testing" }
         @rainpress = Juicer::Minifyer::RainpressCompressor.new
     end
     
     def teardown
         File.delete(@input)
-        File.delete(@output)
+        File.delete(@output) if File.exist?(@output)
+        FileUtils.rm_rf("some") if File.exists?("some")
     end
     
     
     context "#save" do
         should "overwrite existing file" do
             # check rainpress execution?
-            @rainpress.save(@output,@output)
+            @rainpress.save(@input,@input)
         end
         
         should "write compressed input to output" do
@@ -34,6 +31,7 @@ class RainpressCompressorTest < Test::Unit::TestCase
         end
         
         should "create non-existant path" do
+            FileUtils.rm_rf("some") if File.exists?("some")
             output_dir = "some/new/directory"
             @output = File.join(output_dir,@output)
             @rainpress.save(@input,@output)
